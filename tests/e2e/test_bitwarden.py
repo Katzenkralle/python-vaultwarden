@@ -1,10 +1,11 @@
 import os
-import shutil
 import unittest
-from time import sleep
+
 
 from vaultwarden.clients.bitwarden import BitwardenAPIClient
 from vaultwarden.models.bitwarden import get_organization
+
+from .docker_helper import start_docker, stop_docker
 
 # Get Bitwarden credentials from environment variables
 url = os.environ.get("BITWARDEN_URL", None)
@@ -17,18 +18,6 @@ device_id = os.environ.get("BITWARDEN_DEVICE_ID", None)
 
 # Get test organization id from environment variables
 test_organization = os.environ.get("BITWARDEN_TEST_ORGANIZATION", None)
-
-def start_docker():
-    shutil.copytree("tests/fixtures/server", "tests/e2e/temp/", dirs_exist_ok=True)
-    os.system("docker compose -f tests/e2e/compose.yaml up -d")
-    sleep(1)  
-
-def stop_docker():
-    os.system("docker compose -f tests/e2e/compose.yaml down")
-    try:
-        shutil.rmtree("tests/e2e/temp")
-    except FileNotFoundError:
-        pass
 
 class BitwardenBasic(unittest.TestCase):
     def tearDownClass():
