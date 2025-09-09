@@ -1,4 +1,5 @@
 import os
+import shutil
 import unittest
 
 from vaultwarden.clients.bitwarden import BitwardenAPIClient
@@ -11,17 +12,32 @@ password = os.environ.get("BITWARDEN_PASSWORD", None)
 client_id = os.environ.get("BITWARDEN_CLIENT_ID", None)
 client_secret = os.environ.get("BITWARDEN_CLIENT_SECRET", None)
 device_id = os.environ.get("BITWARDEN_DEVICE_ID", None)
-bitwarden = BitwardenAPIClient(
-    url, email, password, client_id, client_secret, device_id
-)
+
 
 # Get test organization id from environment variables
 test_organization = os.environ.get("BITWARDEN_TEST_ORGANIZATION", None)
 
+def start_docker():
+    shutil.copytree("tests/fixtures/server", "tests/e2e/temp/", dirs_exist_ok=True)
+    os.system("docker compose -f tests/e2e/compose.yaml up -d")
+
+def stop_docker():
+    os.system("docker compose -f tests/e2e/compose.yaml down")
+    try:
+        shutil.rmtree("tests/e2e/temp")
+    except FileNotFoundError:
+        pass
 
 class BitwardenBasic(unittest.TestCase):
+    def tearDownClass():
+        stop_docker()
+
     def setUp(self) -> None:
-        self.organization = get_organization(bitwarden, test_organization)
+        start_docker()
+        self.bitwarden = BitwardenAPIClient(
+        url, email, password, client_id, client_secret, device_id
+        )
+        self.organization = get_organization(self.bitwarden, test_organization)
         self.test_colls_names = self.organization.collections(as_dict=True)
         self.test_colls_ids = self.organization.collections()
         self.test_users = self.organization.users()
@@ -38,6 +54,9 @@ class BitwardenBasic(unittest.TestCase):
         self.test_collection_2_users = self.test_colls_names.get(
             "test-collection-2"
         ).users()
+
+    def tearDown(self):
+        stop_docker()
 
     def test_get_organization_users(self):
         self.assertEqual(len(self.test_users), 2)
@@ -97,13 +116,20 @@ class BitwardenBasic(unittest.TestCase):
         )
 
     def test_invite_user_than_remove(self):
-        resp = self.organization.invite("test-user-3@example.com")
-        self.assertTrue(resp.is_success)
         user = self.organization.user_search(
-            "test-user-3@example.com", force_refresh=True
+            "test-account-2@example.com", force_refresh=True
         )
-        self.assertIsNotNone(user)
         user.delete()
+
+        resp = self.organization.invite("test-account-2@example.com")
+        self.assertTrue(resp.is_success)
+        
+        if not os.environ.get("VAULTWARDEN_INVITATIONS_ALLOWED", True).lower() in ["true", "1", "yes"]:
+            user = self.organization.user_search(
+            "test-account-2@example.com", force_refresh=True
+            )
+            resp = self.organization.confirm(user)
+            self.assertTrue(resp.is_success)
 
     def test_add_remove_collection_cipher(self):
         cipher = self.test_org_ciphers[0]
