@@ -339,6 +339,7 @@ class CollectionCipher(BitwardenBaseModel):
 class Organization(BitwardenBaseModel):
     Id: UUID | None = Field(None, validate_default=True)
     Name: str
+    BillingEmail: str
     Object: str | None
     _collections: list[OrganizationCollection] | None = None
     _users: list[OrganizationUserDetails] | None = None
@@ -441,6 +442,7 @@ class Organization(BitwardenBaseModel):
         resp = self.api_client.api_request(
             "PUT", f"api/organizations/{self.Id}", json=payload
         )
+        resp.raise_for_status()
         self.Name = new_name
         return resp
 

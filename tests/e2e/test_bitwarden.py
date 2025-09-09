@@ -1,6 +1,7 @@
 import os
 import shutil
 import unittest
+from time import sleep
 
 from vaultwarden.clients.bitwarden import BitwardenAPIClient
 from vaultwarden.models.bitwarden import get_organization
@@ -20,6 +21,7 @@ test_organization = os.environ.get("BITWARDEN_TEST_ORGANIZATION", None)
 def start_docker():
     shutil.copytree("tests/fixtures/server", "tests/e2e/temp/", dirs_exist_ok=True)
     os.system("docker compose -f tests/e2e/compose.yaml up -d")
+    sleep(1)  
 
 def stop_docker():
     os.system("docker compose -f tests/e2e/compose.yaml down")
@@ -130,6 +132,14 @@ class BitwardenBasic(unittest.TestCase):
             )
             resp = self.organization.confirm(user)
             self.assertTrue(resp.is_success)
+
+    def test_rename_organization(self):
+        old_name = self.organization.Name
+        new_name = "new_test_organization"
+        self.organization.rename(new_name)
+        self.assertEqual(self.organization.Name, new_name)
+        self.organization.rename(old_name)
+        self.assertEqual(self.organization.Name, old_name)
 
     def test_add_remove_collection_cipher(self):
         cipher = self.test_org_ciphers[0]

@@ -14,7 +14,7 @@ set -a; . tests/e2e/.env; set +a
 
 
 # Start Vaultwarden docker
-docker run -d --name vaultwarden -v $temp_dir:/data --env INVITATIONS_ALLOWED=${VAULTWARDEN_INVITATIONS_ALLOWED:-false} --env I_REALLY_WANT_VOLATILE_STORAGE=true --env ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}  --restart unless-stopped -p 80:7777 vaultwarden/server:${VAULTWARDEN_VERSION}
+docker run -d --name vaultwarden -v $temp_dir:/data --env INVITATIONS_ALLOWED=${VAULTWARDEN_INVITATIONS_ALLOWED:-false} --env I_REALLY_WANT_VOLATILE_STORAGE=true --env ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}  --restart unless-stopped -p 80:8080 vaultwarden/server:${VAULTWARDEN_VERSION}
 
 exit 0
 
