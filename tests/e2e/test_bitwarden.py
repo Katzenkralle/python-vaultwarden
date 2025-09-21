@@ -114,6 +114,10 @@ class BitwardenBasic(unittest.TestCase):
         )
 
     def test_invite_user_than_remove(self):
+        user = self.organization.user_search(
+            "test-account-3@example.com", force_refresh=True
+        )
+        user.delete()
         resp = self.organization.invite("test-account-3@example.com")
         self.assertTrue(resp.is_success)
         
@@ -124,10 +128,7 @@ class BitwardenBasic(unittest.TestCase):
             resp = self.organization.confirm(user)
             self.assertTrue(resp.is_success)
             
-        user = self.organization.user_search(
-            "test-account-3@example.com", force_refresh=True
-        )
-        user.delete()
+
 
     def test_rename_organization(self):
         old_name = self.organization.Name
@@ -148,7 +149,7 @@ class BitwardenBasic(unittest.TestCase):
         cipher.update_collection(old_colls)
 
     def test_add_organsiation(self):
-        res = bitwarden.create_organisation("test_me", "me@example.com")
+        res = self.bitwarden.create_organisation("test_me", "me@example.com")
         self.assertTrue(res.is_success)
 
 
