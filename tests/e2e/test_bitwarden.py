@@ -152,6 +152,10 @@ class BitwardenBasic(unittest.TestCase):
         res = self.bitwarden.create_organisation("test_me", "me@example.com")
         self.assertTrue(res.is_success)
 
+    def test_delete_organisation(self):
+        res = self.organization.delete()
+        self.assertTrue(res.is_success)
+
 
     def test_deduplicate(self):
         # Todo build test fixtures and delete them at the end of the test

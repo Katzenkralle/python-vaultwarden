@@ -10,7 +10,7 @@ from vaultwarden.clients.bitwarden import BitwardenAPIClient
 from vaultwarden.models.enum import CipherType, OrganizationUserType
 from vaultwarden.models.exception_models import BitwardenError
 from vaultwarden.models.permissive_model import PermissiveBaseModel
-from vaultwarden.utils.crypto import decrypt, encrypt, encrypt_asym
+from vaultwarden.utils.crypto import decrypt, encrypt, encrypt_asym, hash_password, make_master_key
 
 # Pydantic models for Bitwarden data structures
 
@@ -628,7 +628,22 @@ class Organization(BitwardenBaseModel):
         if raw_key is not None:
             return decrypt(raw_key, self.api_client.connect_token.orgs_key)
         raise BitwardenError(f"No Organizations `{self.Id}` found")
-
+    
+    def delete(self):
+        hash, _ = hash_password(
+            password=self.bitwarden_client.password,
+            salt=self.bitwarden_client.email,
+            iterations=self.bitwarden_client._connect_token.KdfIterations,
+        )
+        payload = {
+            "masterPasswordHash": hash.decode("utf-8")
+        }
+        resp = self.bitwarden_client.api_request(
+            "DELETE",
+            f"api/organizations/{self.Id}",
+            json=payload
+        )
+        return resp
 
 def get_organization(
     bitwarden_client, organisation_id: UUID | str

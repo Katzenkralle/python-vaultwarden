@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "python-vaultwarden"
-version = "1.0.4"
+version = "1.0.5"
 description = "Admin Vaultwarden and Simple Bitwarden Python Client"
 authors = [
     { name = "Lyonel Martinez", email = "lyonel.martinez@numberly.com" },
@@ -57,7 +57,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src/vaultwarden/**/*.py"]
+include = ["src/vaultwarden/**/*.py"]
 [tool.hatch.build.targets.wheel]
 packages = [
     "src/vaultwarden",
