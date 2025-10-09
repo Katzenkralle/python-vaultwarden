@@ -149,7 +149,7 @@ plugins = [
 ]
 
 [tool.commitizen]
-version = "1.0.4"
+version = "1.0.5"
 tag_format = "$version"
 update_changelog_on_bump = true
 version_files = [

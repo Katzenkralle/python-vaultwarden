@@ -184,3 +184,21 @@ class BitwardenAPIClient:
             resp = self._api_request("GET", "api/sync")
             self._sync = SyncData.model_validate_json(resp.text)
         return self._sync
+
+
+    def get_equivalent_domains(self):
+        resp = self.api_request("GET", "api/settings/domains")
+        self._sync.Domains = resp.json()
+        return self._sync.Domains
+    
+    def put_custom_domains(self, entrys: dict[dict[str]]|None):
+        payload = {
+            "excludedGlobalEquivalentDomains": None,
+            "equivalentDomains": entrys
+        }
+        resp = self.api_request("PUT", "api/settings/domains", json=payload)
+        try:
+            self._sync.Domains["equivalentDomains"] = entrys
+        except: 
+            pass
+        return resp

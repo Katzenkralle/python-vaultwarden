@@ -352,12 +352,18 @@ class Organization(BitwardenBaseModel):
             return info.context.get("parent_id")
         return v
 
-    def rename(self, new_name: str):
-        payload = {"name": new_name, "billingEmail": self.BillingEmail}
+    def rename(self, new_name: str = None, new_email: str = None):
+        if not (new_name or new_email):
+            raise KeyError("Name or Email must be provided")
+        payload = {
+            "name": new_name or self.Name,
+            "billingEmail": new_email or self.BillingEmail,
+        }
         resp = self.api_client.api_request(
             "PUT", f"api/organizations/{self.Id}", json=payload
         )
-        self.Name = new_name
+        self.Name = payload["name"]
+        self.BillingEmail = payload["billingEmail"]
         return resp
 
     def invite(

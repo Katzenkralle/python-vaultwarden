@@ -156,6 +156,15 @@ class BitwardenBasic(unittest.TestCase):
         res = self.organization.delete()
         self.assertTrue(res.is_success)
 
+    def test_get_domains(self):
+        res = self.bitwarden.get_equivalent_domains()
+        self.assertIsNotNone(res, "The domain equality could not retrived set!")
+
+    def test_set_domain(self):
+        domains = [["some://domain.invalide"]]
+        self.bitwarden.put_custom_domains(domains)
+        self.assertEqual(self.bitwarden._sync.Domains["equivalentDomains"], domains, "The custom domain could not be set!")
+
 
     def test_deduplicate(self):
         # Todo build test fixtures and delete them at the end of the test

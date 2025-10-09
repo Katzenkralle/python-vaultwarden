@@ -149,3 +149,17 @@ python -m unittests discover
 ## License
 
 Python-vaultwarden is distributed under the terms of the [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html) license.
+---
+
+TODO
+
+GET
+http://localhost:8080/api/settings/
+{"equivalentDomains":[["cybercine-dissabled://234923492348.invalide"]],}
+
+
+
+PUT
+/api/settings/domains
+{"excludedGlobalEquivalentDomains":null,"equivalentDomains":[["cybercine-dissabled://234923492348.invalide"]]}
+{"excludedGlobalEquivalentDomains":null,"equivalentDomains":null}
