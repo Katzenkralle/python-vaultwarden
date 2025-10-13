@@ -19,8 +19,12 @@ class VaultwardenAdminClientBasic(unittest.TestCase):
     def setUp(self) -> None:
         start_docker()
         self.vaultwarden = VaultwardenAdminClient(
-            url=url, admin_secret_token=admin_token
+            url=url, admin_secret_token=admin_token, preload_users=True
         )
+
+    def test_delete_user(self):
+        resp = self.vaultwarden.delete("cd95d118-e96d-4b8d-a000-a10c92dd8f88")
+        self.assertTrue(resp)
 
     def tearDown(self) -> None:
         stop_docker()
